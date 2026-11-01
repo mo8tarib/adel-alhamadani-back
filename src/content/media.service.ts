@@ -1,7 +1,9 @@
 import { Storage } from '@google-cloud/storage';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import {
   BadRequestException,
   Injectable,
+  OnModuleInit,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -30,18 +32,65 @@ type MediaScope = (typeof VALID_SCOPES)[number];
 type UploadedImage = { buffer: Buffer; size: number; mimetype: string };
 
 @Injectable()
-export class MediaService {
-  private readonly storage: Storage;
+export class MediaService implements OnModuleInit {
+  private storage: Storage;
   private readonly bucketName: string;
+  private readonly keyFilename?: string;
+  private readonly serviceAccountSecret?: string;
 
   constructor(
     config: ConfigService,
     @InjectModel(Book.name) private readonly books: Model<Book>,
     @InjectModel(Profile.name) private readonly profiles: Model<Profile>,
   ) {
-    const keyFilename = config.get<string>('GOOGLE_APPLICATION_CREDENTIALS');
-    this.storage = new Storage(keyFilename ? { keyFilename } : {});
+    this.keyFilename = config.get<string>('GOOGLE_APPLICATION_CREDENTIALS');
+    this.serviceAccountSecret = config.get<string>(
+      'GCP_SERVICE_ACCOUNT_SECRET',
+    );
+    this.storage = new Storage(
+      this.keyFilename ? { keyFilename: this.keyFilename } : {},
+    );
     this.bucketName = config.get<string>('GCS_BUCKET') || 'adel-alhamadani';
+  }
+
+  async onModuleInit() {
+    if (!this.serviceAccountSecret) return;
+
+    const secretManager = new SecretManagerServiceClient();
+    try {
+      const [version] = await secretManager.accessSecretVersion({
+        name: this.serviceAccountSecret,
+      });
+      const secret = version.payload?.data?.toString('utf8');
+      if (!secret) throw new Error('Secret payload is empty');
+
+      const key = JSON.parse(secret) as {
+        project_id?: unknown;
+        client_email?: unknown;
+        private_key?: unknown;
+      };
+      if (
+        typeof key.project_id !== 'string' ||
+        typeof key.client_email !== 'string' ||
+        typeof key.private_key !== 'string'
+      ) {
+        throw new Error('Secret does not contain a valid service account key');
+      }
+
+      this.storage = new Storage({
+        projectId: key.project_id,
+        credentials: {
+          client_email: key.client_email,
+          private_key: key.private_key,
+        },
+      });
+    } catch {
+      throw new Error(
+        'Unable to load the configured Google service account secret from Secret Manager',
+      );
+    } finally {
+      await secretManager.close();
+    }
   }
 
   private getBucket() {

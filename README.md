@@ -37,7 +37,7 @@ Create the `mongodb-uri` secret in Secret Manager and grant the Cloud Run servic
 
 For media uploads on Cloud Run, set `GCS_BUCKET=adel-alhamadani` and grant the Cloud Run service identity the **Storage Object Admin** role on that bucket. Prefer using the attached service identity through Application Default Credentials, without a key file.
 
-The service-account JSON key is ignored by Git and Docker. Never add it with `COPY`, a Docker build argument, or a normal build secret: those approaches can expose the key in the image or its build metadata. The application reads a runtime-mounted key when `GOOGLE_APPLICATION_CREDENTIALS` points to it. For local Docker runs, mount it read-only:
+The service-account JSON key is ignored by Git and Docker. Never add it with `COPY`, a Docker build argument, or a normal build secret: those approaches can expose the key in the image or its build metadata. When `GCP_SERVICE_ACCOUNT_SECRET` is set, the app fetches that Secret Manager version during startup and uses it for GCS access. Locally, `.env` can use `GOOGLE_APPLICATION_CREDENTIALS` to authenticate the Secret Manager request. For local Docker runs, mount the key read-only:
 
 ```bash
 docker build -t adel-alhamadani-back:local .
@@ -48,7 +48,7 @@ docker run --rm -p 8080:8080 \
   adel-alhamadani-back:local
 ```
 
-Use the existing Secret Manager version for Cloud Run instead of passing the JSON key to the Docker build. Grant the Cloud Run runtime identity access to the secret:
+Use the existing Secret Manager version for Cloud Run instead of passing or mounting the JSON key in the container. Grant the Cloud Run runtime identity access to the secret:
 
 ```bash
 gcloud secrets add-iam-policy-binding adel-alhamadani-service-account \
@@ -59,11 +59,10 @@ gcloud secrets add-iam-policy-binding adel-alhamadani-service-account \
 gcloud run services update SERVICE_NAME \
   --project=832683193458 \
   --region REGION \
-  --update-secrets=/var/secrets/google/service-account.json=adel-alhamadani-service-account:1 \
-  --update-env-vars=GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/google/service-account.json,GCS_BUCKET=adel-alhamadani
+  --update-env-vars=GCP_SERVICE_ACCOUNT_SECRET=projects/832683193458/secrets/adel-alhamadani-service-account/versions/1,GCS_BUCKET=adel-alhamadani
 ```
 
-Grant the service account inside that key **Storage Object Admin** on the bucket. The Cloud Run runtime identity needs **Secret Manager Secret Accessor** to read the mounted key. Google recommends Secret Manager for runtime secrets, which can be mounted as files. [Cloud Run secrets](https://docs.cloud.google.com/run/docs/configuring/services/secrets), [adding a secret from a file](https://docs.cloud.google.com/secret-manager/docs/add-secret-version).
+Grant the service account inside that key **Storage Object Admin** on the bucket. The Cloud Run runtime identity needs **Secret Manager Secret Accessor** to read the key during startup. Google recommends keeping runtime secrets in Secret Manager. [Cloud Run secrets](https://docs.cloud.google.com/run/docs/configuring/services/secrets), [adding a secret from a file](https://docs.cloud.google.com/secret-manager/docs/add-secret-version).
 
 ## API
 

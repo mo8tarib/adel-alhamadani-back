@@ -21,6 +21,7 @@
     "seed": "npm run build && node dist/content/seed.js"
   },
   "dependencies": {
+    "@google-cloud/secret-manager": "^7.2.0",
     "@google-cloud/storage": "^8.4.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
