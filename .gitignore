@@ -41,6 +41,9 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+*-service-account*.json
+*credentials*.json
+adel-alhamadani-dev-8b88eb71e16e.json
 
 # temp directory
 .temp

@@ -6,5 +6,8 @@ coverage
 .env
 .env.*
 !.env.example
+*-service-account*.json
+*credentials*.json
+adel-alhamadani-dev-8b88eb71e16e.json
 npm-debug.log*
 README.md

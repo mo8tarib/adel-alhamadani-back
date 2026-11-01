@@ -35,6 +35,8 @@ gcloud run deploy adel-alhamadani-back \
 
 Create the `mongodb-uri` secret in Secret Manager and grant the Cloud Run service identity permission to access it before deployment. No `.env` file is copied into the Docker image.
 
+For media uploads on Cloud Run, set `GCS_BUCKET=adel-alhamadani` and grant the Cloud Run service identity the **Storage Object Admin** role on that bucket. Cloud Run uses its attached service identity through Application Default Credentials; do not upload the local service-account JSON key. Locally, `.env` points `GOOGLE_APPLICATION_CREDENTIALS` at the ignored `adel-alhamadani-dev-8b88eb71e16e.json` key file.
+
 ## API
 
 All API routes use the `/api` prefix.
@@ -49,6 +51,18 @@ All API routes use the `/api` prefix.
 - `POST /api/books`, `PATCH /api/books/:id`, and `DELETE /api/books/:id` manage books.
 
 Article fields include title, slug, excerpt, content, tags, publication status, and publication date. Book fields include title, slug, description, cover image URL, purchase URL, visibility, and publication date. MongoDB timestamps are added automatically.
+
+## Book and profile images
+
+Authenticated admins can upload JPEG, PNG, or WebP images up to 5 MB:
+
+- `POST /api/admin/media/covers` uploads a book cover.
+- `POST /api/admin/media/profile` uploads the author portrait.
+- `PUT /api/admin/media/:scope/:id` replaces an image (`scope` is `books` or `profile`).
+- `DELETE /api/admin/media/:scope/:id` deletes an image.
+- `GET /api/media/:scope/:id` serves an uploaded image.
+
+Upload and replace requests use `multipart/form-data` with a `file` field and require the admin bearer token. The response includes `id` and `src`; save `src` to a book's `cover.src` or the profile's `portrait.src` using the existing admin update endpoints. Deleting media removes the object from the bucket; remove or replace its database reference as part of the same content edit.
 
 ## Database seed
 
