@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsOptional, IsString, IsUrl, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MinLength,
+} from 'class-validator';
 
 export class CreateBookDto {
   @ApiProperty() @IsString() @MinLength(1) title: string;

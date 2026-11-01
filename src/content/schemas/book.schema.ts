@@ -6,7 +6,8 @@ export type BookDocument = HydratedDocument<Book>;
 @Schema({ timestamps: true })
 export class Book {
   @Prop({ required: true, trim: true }) title: string;
-  @Prop({ required: true, unique: true, lowercase: true, trim: true }) slug: string;
+  @Prop({ required: true, unique: true, lowercase: true, trim: true })
+  slug: string;
   @Prop({ required: true, trim: true }) description: string;
   @Prop() coverImageUrl?: string;
   @Prop() purchaseUrl?: string;

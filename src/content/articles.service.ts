@@ -7,18 +7,34 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticlesService {
-  constructor(@InjectModel(Article.name) private readonly articles: Model<ArticleDocument>) {}
+  constructor(
+    @InjectModel(Article.name)
+    private readonly articles: Model<ArticleDocument>,
+  ) {}
 
-  findPublished() { return this.articles.find({ published: true }).sort({ publishedAt: -1, createdAt: -1 }).exec(); }
-  findAll() { return this.articles.find().sort({ createdAt: -1 }).exec(); }
+  findPublished() {
+    return this.articles
+      .find({ published: true })
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .exec();
+  }
+  findAll() {
+    return this.articles.find().sort({ createdAt: -1 }).exec();
+  }
   async findBySlug(slug: string) {
-    const article = await this.articles.findOne({ slug, published: true }).exec();
+    const article = await this.articles
+      .findOne({ slug, published: true })
+      .exec();
     if (!article) throw new NotFoundException('Article not found');
     return article;
   }
-  create(dto: CreateArticleDto) { return this.articles.create(dto); }
+  create(dto: CreateArticleDto) {
+    return this.articles.create(dto);
+  }
   async update(id: string, dto: UpdateArticleDto) {
-    const article = await this.articles.findByIdAndUpdate(id, dto, { new: true, runValidators: true }).exec();
+    const article = await this.articles
+      .findByIdAndUpdate(id, dto, { new: true, runValidators: true })
+      .exec();
     if (!article) throw new NotFoundException('Article not found');
     return article;
   }

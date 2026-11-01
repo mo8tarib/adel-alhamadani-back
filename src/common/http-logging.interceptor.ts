@@ -32,7 +32,9 @@ export class HttpLoggingInterceptor implements NestInterceptor {
         const message = `${request.method} ${request.originalUrl} ${status} ${Date.now() - startedAt}ms`;
 
         if (errorMessage || status >= 500) {
-          this.logger.error(`${message}${errorMessage ? ` - ${errorMessage}` : ''}`);
+          this.logger.error(
+            `${message}${errorMessage ? ` - ${errorMessage}` : ''}`,
+          );
         } else if (status >= 400) {
           this.logger.warn(message);
         } else {

@@ -45,7 +45,13 @@ export class AdminMediaController {
   @Post('covers')
   @imageUpload()
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ schema: { type: 'object', required: ['file'], properties: { file: { type: 'string', format: 'binary' } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: { file: { type: 'string', format: 'binary' } },
+    },
+  })
   @ApiCreatedResponse({ description: 'Upload a book cover image' })
   uploadCover(@UploadedFile() file: unknown) {
     return this.media.upload('books', file);
@@ -54,8 +60,16 @@ export class AdminMediaController {
   @Post(':scope')
   @imageUpload()
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ schema: { type: 'object', required: ['file'], properties: { file: { type: 'string', format: 'binary' } } } })
-  @ApiCreatedResponse({ description: 'Upload an image for a book cover or author profile' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: { file: { type: 'string', format: 'binary' } },
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'Upload an image for a book cover or author profile',
+  })
   upload(@Param('scope') scope: string, @UploadedFile() file: unknown) {
     return this.media.upload(scope, file);
   }
@@ -63,9 +77,21 @@ export class AdminMediaController {
   @Put(':scope/:id')
   @imageUpload()
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ schema: { type: 'object', required: ['file'], properties: { file: { type: 'string', format: 'binary' } } } })
-  @ApiOkResponse({ description: 'Replace an uploaded image while keeping its URL' })
-  replace(@Param('scope') scope: string, @Param('id') id: string, @UploadedFile() file: unknown) {
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: { file: { type: 'string', format: 'binary' } },
+    },
+  })
+  @ApiOkResponse({
+    description: 'Replace an uploaded image while keeping its URL',
+  })
+  replace(
+    @Param('scope') scope: string,
+    @Param('id') id: string,
+    @UploadedFile() file: unknown,
+  ) {
     return this.media.replace(scope, id, file);
   }
 
@@ -83,7 +109,11 @@ export class MediaController {
 
   @Get(':scope/:id')
   @ApiOkResponse({ description: 'Read an image from Google Cloud Storage' })
-  get(@Param('scope') scope: string, @Param('id') id: string, @Res() response: Response) {
+  get(
+    @Param('scope') scope: string,
+    @Param('id') id: string,
+    @Res() response: Response,
+  ) {
     return this.media.stream(scope, id, response);
   }
 }
