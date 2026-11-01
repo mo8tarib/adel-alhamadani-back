@@ -7,15 +7,11 @@ export const SEED_CONTENT = {
     "sources": [],
     "links": [],
     "portrait": {
-      "src": "/images/author/adel-alhamadani.png",
-      "altAr": "الكاتب والإعلامي العُماني عادل الحمداني، في صورة منشورة مع مقاله في صحيفة الشبيبة",
-      "width": 700,
-      "height": 400,
-      "sourceUrl": "https://shabiba.com/article/210404",
-      "sourceNameAr": "الشبيبة",
-      "imageSourceUrl": "https://shabiba.eu-central-1.linodeobjects.com/2026/09/1789023727-1789023727-zjvz98ob4ji1.jpeg",
-      "verifiedAt": "2026-10-18",
-      "approvalStatus": "pending"
+      "src": "https://storage.googleapis.com/adel-alhamadani/profile/adel-alhamadani.png",
+      "altAr": "الكاتب والإعلامي العُماني عادل الحمداني",
+      "sourceUrl": "https://storage.googleapis.com/adel-alhamadani/profile/adel-alhamadani.png",
+      "sourceNameAr": "صورة الملف الشخصي",
+      "approvalStatus": "user-selected"
     }
   },
   "books": [
