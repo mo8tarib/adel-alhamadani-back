@@ -49,3 +49,7 @@ All API routes use the `/api` prefix.
 - `POST /api/books`, `PATCH /api/books/:id`, and `DELETE /api/books/:id` manage books.
 
 Article fields include title, slug, excerpt, content, tags, publication status, and publication date. Book fields include title, slug, description, cover image URL, purchase URL, visibility, and publication date. MongoDB timestamps are added automatically.
+
+## Database seed
+
+Run `npm run seed` from the backend directory to build and seed MongoDB from `src/content/seed-data.ts`. Books and articles are inserted by slug and existing records are only enriched with fields they do not yet contain; current admin edits and publication status are preserved. The profile receives the Arabic author label and the configured default portrait only when those profile values are missing. Set `MONGODB_URI` in the backend environment before running the command.
