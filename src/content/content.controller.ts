@@ -23,6 +23,8 @@ export class AuthController {
   login(@Body() body: any) { return this.auth.login(body.username, body.password); }
   @Get('me') @UseGuards(AdminGuard) @ApiBearerAuth('access-token') @ApiOkResponse({schema:{type:'object',properties:{id:{type:'string'},username:{type:'string'},role:{type:'string',enum:['owner','admin']}}}})
   me(@Req() request: any) { return request.admin; }
+  @Patch('password') @UseGuards(AdminGuard) @ApiBearerAuth('access-token') @ApiBody({schema:{type:'object',required:['currentPassword','newPassword'],properties:{currentPassword:{type:'string',format:'password'},newPassword:{type:'string',format:'password',minLength:12}}}}) @ApiOkResponse({schema:{type:'object',properties:{changed:{type:'boolean'}}}})
+  changePassword(@Req() request:any,@Body() body:any) { return this.auth.changePassword(request.admin.id,body.currentPassword,body.newPassword); }
 }
 
 @ApiTags('Admin') @ApiBearerAuth('access-token') @Controller('admin') @UseGuards(AdminGuard)
