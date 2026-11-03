@@ -10,6 +10,9 @@ async function bootstrap() {
     [
       'http://localhost:4200',
       'https://adel-alhamadani.cloud.run',
+      'https://adel-alhamadani-front-55432195656.europe-west1.run.app',
+      'https://adel-alhamadani.com',
+      'https://www.adel-alhamadani.com',
       process.env.FRONTEND_ORIGIN,
     ].filter((origin): origin is string => Boolean(origin)),
   );
